@@ -150,4 +150,26 @@
                 const successMsg = document.getElementById('successMsg');
                 successMsg.style.display = 'block';
                 successMsg.innerHTML = `
-                    <strong>دستورالعمل:</strong>
+                    <strong>دستورالعمل:</strong><br>
+                    ۱. روی دکمه آبی بالای صفحه کلیک کن تا آرشیو در تب جدید باز بشه.<br>
+                    ۲. وقتی صفحه آرشیو کامل لود شد، در همون تب این کد رو در Address Bar کپی کن و Enter بزن:<br><br>
+                    <code style="background:#f8f9fa;padding:10px;display:inline-block;border-radius:6px;">
+                    javascript:(function(){let text='';document.querySelectorAll('article p, article h1, article h2, article h3').forEach(el=>text+=el.innerText+'\\n\\n');navigator.clipboard.writeText(text);alert('متن مقاله کپی شد! حالا می‌تونی بذاری تو چت با Grok و بگی ترجمه کن به فارسی.');})()
+                    </code><br><br>
+                    متن کامل مقاله کپی می‌شه!
+                `;
+                window.open(archivedUrl, '_blank');
+            } catch (e) {
+                alert('مشکلی پیش اومد. صفحه آرشیو رو دستی باز کن و متن رو انتخاب کن.');
+            }
+        }
+
+        // Enter برای دکمه اول
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                openArchive();
+            }
+        });
+    </script>
+</body>
+</html>
