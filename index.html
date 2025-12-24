@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آرشیو صفحه وب با archive.ph (ویژه Economist)</title>
+    <title>آرشیو خودکار Economist با archive.ph</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
@@ -65,22 +65,29 @@
             text-decoration: none;
             font-size: 18px;
         }
+        .note {
+            font-size: 14px;
+            color: #666;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>آرشیو صفحه وب با archive.ph</h1>
-        <p>آدرس صفحه (مخصوصاً از economist.com) رو وارد کن:<br>
-        پارامترهای اضافی (utm و ...) خودکار حذف می‌شن!</p>
+        <h1>آرشیو خودکار مقالات Economist</h1>
+        <p>لینک مقاله (از سایت یا ایمیل) رو وارد کن:<br>
+        پارامترهای tracking خودکار حذف می‌شن و مستقیم به آرشیو جدید می‌ره!</p>
         
-        <input type="url" id="urlInput" placeholder="https://www.economist.com/..." />
+        <input type="url" id="urlInput" placeholder="https://www.economist.com/... یا https://click.e.economist.com/..." />
         
-        <button onclick="archivePage()">آرشیو کن و برو به صفحه</button>
+        <button onclick="archivePage()">آرشیو جدید بگیر و برو</button>
         
         <div class="result" id="result">
-            <p>لینک آرشیو شده (تمیز شده):</p>
-            <a href="#" id="archiveLink" target="_blank"></a>
+            <p>در حال انتقال به آرشیو جدید...</p>
+            <a href="#" id="archiveLink" target="_blank">اگر منتقل نشدی، اینجا کلیک کن</a>
         </div>
+        
+        <p class="note">هر بار استفاده، یک snapshot تازه می‌گیره – عالی برای مقالات به‌روز!</p>
     </div>
 
     <script>
@@ -92,32 +99,30 @@
                 return;
             }
             
-            // اگر http/https نداشته باشه، اضافه کن
+            // اضافه کردن https اگر نباشه
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
                 url = 'https://' + url;
                 document.getElementById('urlInput').value = url;
             }
             
-            // مخصوص Economist: حذف query string اگر دامنه economist.com باشه
+            // مخصوص Economist: حذف همه پارامترها (برای لینک‌های ایمیلی و معمولی)
             if (url.includes('economist.com')) {
-                const cleanUrl = url.split('?')[0];  // همه چیز بعد از ? حذف می‌شه
+                const cleanUrl = url.split('?')[0].split('#')[0];
                 url = cleanUrl;
             }
             
-            // ساخت لینک archive.ph
-            const archivedUrl = 'https://archive.ph/' + encodeURIComponent(url);
+            // لینک مستقیم به newest – force snapshot جدید
+            const archivedUrl = 'https://archive.ph/newest/' + encodeURIComponent(url);
             
-            // نمایش لینک
+            // نمایش لینک پشتیبان
             const resultDiv = document.getElementById('result');
             const link = document.getElementById('archiveLink');
             link.href = archivedUrl;
             link.textContent = archivedUrl;
             resultDiv.style.display = 'block';
             
-            // ریدایرکت خودکار بعد از ۲ ثانیه
-            setTimeout(() => {
-                window.location.href = archivedUrl;
-            }, 2000);
+            // ریدایرکت خودکار فوری
+            window.location.href = archivedUrl;
         }
         
         // با Enter هم کار کنه
