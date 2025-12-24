@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>آرشیو صفحه وب با archive.ph (ویژه Economist)</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #555;
+            margin-bottom: 30px;
+        }
+        input[type="url"] {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+            direction: ltr;
+            text-align: left;
+        }
+        button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e8f4ff;
+            border-radius: 8px;
+            word-break: break-all;
+            display: none;
+        }
+        .result a {
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>آرشیو صفحه وب با archive.ph</h1>
+        <p>آدرس صفحه (مخصوصاً از economist.com) رو وارد کن:<br>
+        پارامترهای اضافی (utm و ...) خودکار حذف می‌شن!</p>
+        
+        <input type="url" id="urlInput" placeholder="https://www.economist.com/..." />
+        
+        <button onclick="archivePage()">آرشیو کن و برو به صفحه</button>
+        
+        <div class="result" id="result">
+            <p>لینک آرشیو شده (تمیز شده):</p>
+            <a href="#" id="archiveLink" target="_blank"></a>
+        </div>
+    </div>
+
+    <script>
+        function archivePage() {
+            let url = document.getElementById('urlInput').value.trim();
+            
+            if (!url) {
+                alert('لطفاً یک آدرس معتبر وارد کنید!');
+                return;
+            }
+            
+            // اگر http/https نداشته باشه، اضافه کن
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+                document.getElementById('urlInput').value = url;
+            }
+            
+            // مخصوص Economist: حذف query string اگر دامنه economist.com باشه
+            if (url.includes('economist.com')) {
+                const cleanUrl = url.split('?')[0];  // همه چیز بعد از ? حذف می‌شه
+                url = cleanUrl;
+            }
+            
+            // ساخت لینک archive.ph
+            const archivedUrl = 'https://archive.ph/' + encodeURIComponent(url);
+            
+            // نمایش لینک
+            const resultDiv = document.getElementById('result');
+            const link = document.getElementById('archiveLink');
+            link.href = archivedUrl;
+            link.textContent = archivedUrl;
+            resultDiv.style.display = 'block';
+            
+            // ریدایرکت خودکار بعد از ۲ ثانیه
+            setTimeout(() => {
+                window.location.href = archivedUrl;
+            }, 2000);
+        }
+        
+        // با Enter هم کار کنه
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                archivePage();
+            }
+        });
+    </script>
+</body>
+</html>
