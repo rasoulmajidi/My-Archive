@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آرشیو خودکار Economist با archive.ph</title>
+    <title>آرشیو خودکار مقالات Economist</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
@@ -69,25 +69,30 @@
             font-size: 14px;
             color: #666;
             margin-top: 20px;
+            line-height: 1.6;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>آرشیو خودکار مقالات Economist</h1>
-        <p>لینک مقاله (از سایت یا ایمیل) رو وارد کن:<br>
+        <p>لینک مقاله رو وارد کن:<br>
         پارامترهای tracking خودکار حذف می‌شن و مستقیم به آرشیو جدید می‌ره!</p>
         
-        <input type="url" id="urlInput" placeholder="https://www.economist.com/... یا https://click.e.economist.com/..." />
+        <input type="url" id="urlInput" placeholder="https://www.economist.com/... " />
         
-        <button onclick="archivePage()">آرشیو جدید بگیر و برو</button>
+        <button onclick="archivePage()">آرشیو جدید بگیر (در تب جدید)</button>
         
         <div class="result" id="result">
-            <p>در حال انتقال به آرشیو جدید...</p>
-            <a href="#" id="archiveLink" target="_blank">اگر منتقل نشدی، اینجا کلیک کن</a>
+            <p>در حال انتقال به آرشیو جدید (در تب جدید)...</p>
+            <a href="#" id="archiveLink" target="_blank">اگر باز نشد، اینجا کلیک کن</a>
         </div>
         
-        <p class="note">هر بار استفاده، یک snapshot تازه می‌گیره – عالی برای مقالات به‌روز!</p>
+        <p class="note">
+            <strong>نکته برای لینک‌های ایمیلی:</strong><br>
+            لینک‌های click.e.economist.com رو اول در مرورگر باز کنید (ریدایرکت می‌شه به لینک تمیز economist.com)،<br>
+            بعد اون لینک نهایی رو اینجا بذارید تا snapshot جدید بگیره.
+        </p>
     </div>
 
     <script>
@@ -105,13 +110,13 @@
                 document.getElementById('urlInput').value = url;
             }
             
-            // مخصوص Economist: حذف همه پارامترها (برای لینک‌های ایمیلی و معمولی)
+            // مخصوص Economist: حذف همه پارامترها
             if (url.includes('economist.com')) {
                 const cleanUrl = url.split('?')[0].split('#')[0];
                 url = cleanUrl;
             }
             
-            // لینک مستقیم به newest – force snapshot جدید
+            // لینک مستقیم به newest – snapshot جدید
             const archivedUrl = 'https://archive.ph/newest/' + encodeURIComponent(url);
             
             // نمایش لینک پشتیبان
@@ -121,8 +126,8 @@
             link.textContent = archivedUrl;
             resultDiv.style.display = 'block';
             
-            // ریدایرکت خودکار فوری
-            window.location.href = archivedUrl;
+            // باز کردن در تب جدید
+            window.open(archivedUrl, '_blank');
         }
         
         // با Enter هم کار کنه
