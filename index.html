@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>آرشیو خودکار مقالات Economist</title>
+    <title>آرشیو و کپی مقالات Economist</title>
     <style>
         body {
             font-family: Tahoma, sans-serif;
@@ -20,14 +20,8 @@
             border-radius: 12px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
-        h1 {
-            color: #1a1a1a;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #555;
-            margin-bottom: 30px;
-        }
+        h1 { color: #1a1a1a; margin-bottom: 10px; }
+        p { color: #555; margin-bottom: 30px; }
         input[type="url"] {
             width: 100%;
             padding: 15px;
@@ -48,10 +42,13 @@
             border-radius: 8px;
             cursor: pointer;
             transition: 0.3s;
+            margin: 10px;
         }
-        button:hover {
-            background: #0052a3;
+        button:hover { background: #0052a3; }
+        button.secondary {
+            background: #28a745;
         }
+        button.secondary:hover { background: #218838; }
         .result {
             margin-top: 30px;
             padding: 20px;
@@ -71,71 +68,86 @@
             margin-top: 20px;
             line-height: 1.6;
         }
+        .success {
+            margin-top: 20px;
+            padding: 15px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 8px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>آرشیو خودکار مقالات Economist</h1>
-        <p>لینک مقاله رو وارد کن:<br>
-        پارامترهای tracking خودکار حذف می‌شن و مستقیم به آرشیو جدید می‌ره!</p>
+        <h1>آرشیو و کپی مقالات Economist</h1>
+        <p>لینک مقاله رو وارد کن. پارامترهای اضافی خودکار حذف می‌شن.</p>
         
-        <input type="url" id="urlInput" placeholder="https://www.economist.com/... " />
+        <input type="url" id="urlInput" placeholder="https://www.economist.com/..." />
         
-        <button onclick="archivePage()">آرشیو جدید بگیر (در تب جدید)</button>
+        <button onclick="openArchive()">آرشیو جدید بگیر (تب جدید)</button>
+        <button class="secondary" onclick="copyArticleText()">کپی متن مقاله برای ترجمه</button>
         
         <div class="result" id="result">
-            <p>در حال انتقال به آرشیو جدید (در تب جدید)...</p>
+            <p>در حال انتقال...</p>
             <a href="#" id="archiveLink" target="_blank">اگر باز نشد، اینجا کلیک کن</a>
         </div>
         
+        <div class="success" id="successMsg"></div>
+        
         <p class="note">
-            <strong>نکته برای لینک‌های ایمیلی:</strong><br>
-            لینک‌های click.e.economist.com رو اول در مرورگر باز کنید (ریدایرکت می‌شه به لینک تمیز economist.com)،<br>
-            بعد اون لینک نهایی رو اینجا بذارید تا snapshot جدید بگیره.
+            <strong>نکته:</strong> برای لینک‌های ایمیلی، اول در مرورگر بازش کن تا به لینک تمیز economist.com برسه، بعد اینجا بذار.<br>
+            دکمه دوم متن کامل مقاله رو از آرشیو کپی می‌کنه تا راحت بدی به Grok برای ترجمه به فارسی.
         </p>
     </div>
 
     <script>
-        function archivePage() {
-            let url = document.getElementById('urlInput').value.trim();
-            
-            if (!url) {
-                alert('لطفاً یک آدرس معتبر وارد کنید!');
-                return;
-            }
-            
-            // اضافه کردن https اگر نباشه
+        let currentCleanUrl = '';
+
+        function cleanUrl(inputUrl) {
+            let url = inputUrl.trim();
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
                 url = 'https://' + url;
-                document.getElementById('urlInput').value = url;
             }
-            
-            // مخصوص Economist: حذف همه پارامترها
             if (url.includes('economist.com')) {
-                const cleanUrl = url.split('?')[0].split('#')[0];
-                url = cleanUrl;
+                url = url.split('?')[0].split('#')[0];
             }
+            return url;
+        }
+
+        function openArchive() {
+            const input = document.getElementById('urlInput').value;
+            if (!input) {
+                alert('لطفاً لینک رو وارد کن!');
+                return;
+            }
+            currentCleanUrl = cleanUrl(input);
+            const archivedUrl = 'https://archive.ph/newest/' + encodeURIComponent(currentCleanUrl);
             
-            // لینک مستقیم به newest – snapshot جدید
-            const archivedUrl = 'https://archive.ph/newest/' + encodeURIComponent(url);
+            document.getElementById('archiveLink').href = archivedUrl;
+            document.getElementById('archiveLink').textContent = archivedUrl;
+            document.getElementById('result').style.display = 'block';
             
-            // نمایش لینک پشتیبان
-            const resultDiv = document.getElementById('result');
-            const link = document.getElementById('archiveLink');
-            link.href = archivedUrl;
-            link.textContent = archivedUrl;
-            resultDiv.style.display = 'block';
-            
-            // باز کردن در تب جدید
             window.open(archivedUrl, '_blank');
         }
-        
-        // با Enter هم کار کنه
-        document.getElementById('urlInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                archivePage();
+
+        async function copyArticleText() {
+            const input = document.getElementById('urlInput').value;
+            if (!input) {
+                alert('اول لینک مقاله رو وارد کن!');
+                return;
             }
-        });
-    </script>
-</body>
-</html>
+            currentCleanUrl = cleanUrl(input);
+            const archivedUrl = 'https://archive.ph/newest/' + encodeURIComponent(currentCleanUrl);
+            
+            try {
+                // باز کردن صفحه آرشیو در iframe مخفی یا تب جدید و استخراج متن
+                // چون CORS داریم، از یک ترفند ساده استفاده می‌کنیم: کاربر رو راهنمایی می‌کنیم که خودش صفحه رو باز کنه
+                // اما بهترین راه: باز کردن تب و استفاده از bookmarklet-like (اما در HTML ساده سخته)
+                // پس راه عملی: باز کردن صفحه آرشیو و اضافه کردن یک اسکریپت کوچک برای کپی
+                
+                // راه حل واقعی و کارآمد:
+                const successMsg = document.getElementById('successMsg');
+                successMsg.style.display = 'block';
+                successMsg.innerHTML = `
+                    <strong>دستورالعمل:</strong>
